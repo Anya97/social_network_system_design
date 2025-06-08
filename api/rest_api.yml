@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Social Network API (Write Operations)
+  title: Social Network API
   version: 1.0.0
 
 paths:
@@ -13,7 +13,6 @@ paths:
           required: true
           schema:
             type: string
-          description: ID of the user creating the post
       requestBody:
         required: true
         content:
@@ -49,6 +48,38 @@ paths:
           description: Post created
         '400':
           description: Invalid input
+        '500':
+          description: Internal server error
+
+    get:
+      summary: Get posts by a specific user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of posts by the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid request
         '500':
           description: Internal server error
 
@@ -122,7 +153,6 @@ paths:
           required: true
           schema:
             type: string
-          description: ID of the post
       requestBody:
         required: true
         content:
@@ -140,6 +170,38 @@ paths:
           description: Comment created
         '400':
           description: Invalid input
+        '500':
+          description: Internal server error
+
+    get:
+      summary: Get comments for a specific post
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Comments list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid request
         '500':
           description: Internal server error
 
@@ -262,6 +324,38 @@ paths:
         '500':
           description: Internal server error
 
+    get:
+      summary: Get the list of subscriptions for a user
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
+
   /users/{user_id}/subscriptions/{target_user_id}:
     delete:
       summary: Unsubscribe from a user
@@ -283,3 +377,94 @@ paths:
           description: Invalid input
         '500':
           description: Internal server error
+
+  /users/{user_id}/feed:
+    get:
+      summary: Get the user's feed
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: User feed returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+        '400':
+          description: Invalid request
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        text:
+          type: string
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              url:
+                type: string
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: float
+            longitude:
+              type: number
+              format: float
+        created_at:
+          type: string
+          format: date-time
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        post_id:
+          type: string
+        user_id:
+          type: string
+        text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        full_name:
+          type: string
