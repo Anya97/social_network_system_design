@@ -297,6 +297,33 @@ paths:
         '500':
           description: Internal server error
 
+  /post/{post_id}/likes:
+    get:
+      summary: Get like count for a post
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Number of likes for the post
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  like_count:
+                    type: integer
+                    example: 123
+        '400':
+          description: Invalid request
+        '404':
+          description: Post not found
+        '500':
+          description: Internal server error
+
   /users/{user_id}/subscriptions:
     post:
       summary: Subscribe to another user
@@ -411,6 +438,36 @@ paths:
         '500':
           description: Internal server error
 
+  /media:
+    post:
+      summary: Upload a new media file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [ file, user_id ]
+              properties:
+                user_id:
+                  type: string
+                  description: ID of the uploading user
+                file:
+                  type: string
+                  format: binary
+                  description: Media file to upload
+      responses:
+        '201':
+          description: Media uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+
 components:
   schemas:
     Post:
@@ -467,4 +524,16 @@ components:
         username:
           type: string
         full_name:
+          type: string
+
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        url:
+          type: string
+        description:
           type: string
