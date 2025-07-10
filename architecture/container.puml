@@ -1,0 +1,54 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include <cloudinsight/redis>
+!include <cloudinsight/mongodb>
+
+skinparam defaultTextAlignment center
+
+Person(user, "User", "A person using the platform")
+Container(clientApp, "Client Application", "Web/Mobile App", "Interface used by the user to interact with the system")
+
+Container_Ext(cdn, "CDN", "CloudFront", "Delivers images to users")
+Container_Ext(s3, "Object Storage", "S3", "Stores uploaded images")
+
+Container(loadBalancer, "Load Balancer", "Nginx", "Distributes requests using round robin")
+
+System_Boundary(socialPlatform, "Social Platform") {
+
+    together {
+        Container(postsService, "Posts Service", "Go", "Create/delete posts, view posts, upload images to S3", $tags="webApp")
+        Container(reactionsService, "Reactions Service", "Go", "Like/unlike posts, add/delete comments with images", $tags="webApp")
+        Container(feedService, "Follow Feed Service", "Go", "Follow/unfollow users, view feed", $tags="webApp")
+    }
+
+    ContainerDb(postsRedis, "Posts Cache", "Redis", "Caches post data", $sprite="redis", $tags="cache")
+    ContainerDb(postsDb, "Posts Database", "MongoDB", "Stores post documents", $sprite="mongodb", $tags="db")
+
+    ContainerDb(reactionsRedis, "Reactions Cache", "Redis", "Caches reactions and comments", $sprite="redis", $tags="cache")
+    ContainerDb(reactionsDb, "Reactions Database", "MongoDB", "Stores likes and comments", $sprite="mongodb", $tags="db")
+
+    ContainerDb(feedRedis, "Feed Cache", "Redis", "Caches user feed data", $sprite="redis", $tags="cache")
+    ContainerDb(feedDb, "Feed Database", "MongoDB", "Stores follow relationships", $sprite="mongodb", $tags="db")
+}
+
+Rel(user, clientApp, "Interacts with")
+Rel(clientApp, loadBalancer, "Sends requests to", "HTTPS")
+Rel(clientApp, cdn, "Get images", "HTTPS")
+
+Rel(loadBalancer, postsService, "Routes requests", "HTTP")
+Rel(loadBalancer, reactionsService, "Routes requests", "HTTP")
+Rel(loadBalancer, feedService, "Routes requests", "HTTP")
+
+Rel(postsService, postsRedis, "Reads (first) / Writes (after DB)")
+Rel(postsService, postsDb, "Reads (fallback) / Writes (first)")
+Rel(postsService, s3, "Uploads images")
+
+Rel(reactionsService, reactionsRedis, "Reads (first) / Writes (after DB)")
+Rel(reactionsService, reactionsDb, "Reads (fallback) / Writes (first)")
+
+Rel(feedService, feedRedis, "Reads (first) / Writes (after DB)")
+Rel(feedService, feedDb, "Reads (fallback) / Writes (first)")
+
+Rel(cdn, s3, "Fetches images")
+
+@enduml

@@ -1,0 +1,17 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "A person using the platform")
+
+Container(clientApp, "Client Application", "Web/Mobile App", "Interface through which the user interacts with the system")
+
+Container(postsService, "Posts Service", "API Service", "Create/delete posts with description, view own and others' posts")
+Container(reactionsService, "Reactions Service", "API Service", "Like/unlike posts, add/delete comments (with optional images)")
+Container(feedService, "Follow Feed Service", "API Service", "View feed of followed users, follow/unfollow users")
+
+Rel(user, clientApp, "Uses")
+Rel(clientApp, postsService, "Creates and views posts", "HTTP")
+Rel(clientApp, reactionsService, "Likes and comments on posts", "HTTP")
+Rel(clientApp, feedService, "Follows users and views feed", "HTTP")
+
+@enduml
