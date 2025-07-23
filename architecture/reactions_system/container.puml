@@ -1,0 +1,23 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include <cloudinsight/mongodb>
+
+Person(user, "User", "A person using the platform")
+Container(clientApp, "Client Application", "Web/Mobile App", "Interface for interacting with reactions (likes, comments)")
+Container(loadBalancer, "Load Balancer", "Nginx", "Distributes requests")
+
+System_Boundary(reactionsSystem, "Reactions System") {
+    Container(reactionsService, "Reactions Service", "Go", "Handles likes, comments with optional images", $tags="webApp")
+    ContainerDb(reactionsDb, "Reactions Database", "MongoDB", "Stores likes and comments with metadata and image references", $sprite="mongodb", $tags="db")
+}
+
+Container_Ext(feedSystem, "Feed System", "Go", "Generates user feeds based on subscriptions, posts, and reactions")
+
+Rel(user, clientApp, "Uses", "HTTPS")
+Rel(clientApp, loadBalancer, "Sends requests", "HTTPS")
+Rel(loadBalancer, reactionsService, "Routes reaction-related requests", "HTTP")
+Rel(reactionsService, reactionsDb, "Stores and retrieves likes and comments")
+
+Rel(feedSystem, reactionsDb, "Reads likes and comments for feed generation")
+
+@enduml

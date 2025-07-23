@@ -25,5 +25,3 @@ db.createCollection("post_likes", {
 
 db.post_likes.createIndex({ user_id: 1 });
 db.post_likes.createIndex({ post_id: 1 });
-
-+ Redis в качестве кэша
