@@ -7,6 +7,7 @@
 Person(user, "User", "A person using the platform")
 Container(clientApp, "Client Application", "Web/Mobile App", "Interface used by the user to interact with the system")
 Container(loadBalancer, "Load Balancer", "Nginx", "Distributes requests using round robin")
+Container_Ext(cdn, "CDN", "CloudFront", "Delivers post images from S3")
 
 ' — Внешние базы данных —
 ContainerDb_Ext(postsDb, "Posts DB", "MongoDB", "Posts System", $sprite="mongodb", $tags="db")
@@ -22,8 +23,9 @@ System_Boundary(feedSystem, "Feed System") {
 ' — Взаимодействия —
 Rel(user, clientApp, "Interacts with")
 Rel(clientApp, loadBalancer, "Sends requests to", "HTTPS")
-Rel(loadBalancer, feedService, "Routes requests", "HTTP")
+Rel(clientApp, cdn, "Loads images in feed", "HTTPS")
 
+Rel(loadBalancer, feedService, "Routes requests", "HTTP")
 Rel(feedService, feedStore, "Reads precomputed feed", "GET by user_id")
 Rel(feedGeneratorTask, feedStore, "Writes precomputed feed", "SET by user_id")
 

@@ -12,16 +12,20 @@ System_Boundary(postsSystem, "Posts System") {
     Container_Ext(s3, "Object Storage", "S3", "Stores uploaded post images")
 }
 
-' Feed System (represented externally, since it's another system)
+Container_Ext(cdn, "CDN", "CloudFront", "Delivers post images to users")
+
+' Feed System (represented externally)
 Container_Ext(feedSystem, "Feed System", "Go", "Generates user feeds based on subscriptions and post data")
 
 Rel(user, clientApp, "Uses", "HTTPS")
 Rel(clientApp, loadBalancer, "Sends requests", "HTTPS")
 Rel(loadBalancer, postsService, "Routes post-related requests", "HTTP")
 Rel(postsService, postsDb, "Stores and retrieves post documents")
-Rel(postsService, s3, "Uploads and retrieves post images")
+Rel(postsService, s3, "Uploads post images")
 
-' Feed system accesses posts data
+Rel(clientApp, cdn, "Downloads images", "HTTPS")
+Rel(cdn, s3, "Fetches images on cache miss")
+
 Rel(feedSystem, postsDb, "Reads post data for feed generation")
 
 @enduml
