@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include <cloudinsight/redis>
+!include <cloudinsight/mongodb>
+
+' — Элементы вне подсистемы —
+Person(user, "User", "A person using the platform")
+Container(clientApp, "Client Application", "Web/Mobile App", "Interface used by the user to interact with the system")
+Container(loadBalancer, "Load Balancer", "Nginx", "Distributes requests using round robin")
+Container_Ext(cdn, "CDN", "CloudFront", "Delivers post images from S3")
+
+' — Внешние базы данных —
+ContainerDb_Ext(postsDb, "Posts DB", "MongoDB", "Posts System", $sprite="mongodb", $tags="db")
+ContainerDb_Ext(reactionsDb, "Reactions DB", "MongoDB", "Reactions System", $sprite="mongodb", $tags="db")
+ContainerDb_Ext(subscriptionsDb, "Subscriptions DB", "MongoDB", "Subscriptions System", $sprite="mongodb", $tags="db")
+
+System_Boundary(feedSystem, "Feed System") {
+    Container(feedService, "Feed Service", "Go", "Returns personalized feed for user", $tags="webApp")
+    Container(feedGeneratorTask, "Feed Generator Task", "Go", "Periodically aggregates posts from followed users along with reactions and stores precomputed feed", $tags="worker")
+    ContainerDb(feedStore, "Feed KV Store", "Redis", "Precomputed user feed, sharded by user_id", $sprite="redis", $tags="cache")
+}
+
+' — Взаимодействия —
+Rel(user, clientApp, "Interacts with")
+Rel(clientApp, loadBalancer, "Sends requests to", "HTTPS")
+Rel(clientApp, cdn, "Loads images in feed", "HTTPS")
+
+Rel(loadBalancer, feedService, "Routes requests", "HTTP")
+Rel(feedService, feedStore, "Reads precomputed feed", "GET by user_id")
+Rel(feedGeneratorTask, feedStore, "Writes precomputed feed", "SET by user_id")
+
+Rel(feedGeneratorTask, postsDb, "Reads posts of followed users")
+Rel(feedGeneratorTask, reactionsDb, "Reads reactions for posts")
+Rel(feedGeneratorTask, subscriptionsDb, "Reads user subscriptions")
+@enduml

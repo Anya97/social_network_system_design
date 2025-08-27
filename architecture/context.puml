@@ -1,0 +1,24 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User", "A person using the platform")
+
+Container(clientApp, "Client Application", "Web/Mobile App", "Interface through which the user interacts with the system")
+
+Container(postsSystem, "Posts System", "Software system", "Create/delete posts with description, view own and others' posts")
+Container(reactionsSystem, "Reactions System", "Software system", "Like posts, add/delete comments (with optional images)")
+Container(subscriptionsSystem, "Subscriptions System", "Software system", "Follow/unfollow users, manage subscriptions")
+Container(feedSystem, "Feed System", "Software system", "Provide user's feed with new posts from followed users")
+
+' External CDN
+Container_Ext(cdn, "CDN", "CloudFront", "Delivers images to users")
+
+' Relationships
+Rel(user, clientApp, "Uses")
+Rel(clientApp, postsSystem, "Creates and views posts", "HTTP")
+Rel(clientApp, reactionsSystem, "Likes and comments on posts", "HTTP")
+Rel(clientApp, subscriptionsSystem, "Follows/unfollows users", "HTTP")
+Rel(clientApp, feedSystem, "Views pre-generated feed", "HTTP")
+
+Rel(clientApp, cdn, "Fetches images", "HTTPS")
+@enduml

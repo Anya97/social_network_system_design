@@ -28,5 +28,3 @@ db.createCollection("subscriptions", {
 });
 
 db.post_likes.createIndex({ user_id: 1 });
-
-+ Redis в качестве кэша

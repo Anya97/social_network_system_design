@@ -1,5 +1,7 @@
 # 📐 System Design Social network для [курса по System Design](https://balun.courses/courses/system_design)
 
+---
+
 ## 🧩 Функциональные требования
 
 - Публикация постов (текст + фотографии)
@@ -68,6 +70,54 @@
 | Комментарии | 579 | 0          | 500       | ~290                |
 | Подписки    | 116 | 0          | 5         | ~0.6                |
 
+
+---
+
+## 🧠 Обзор архитектуры
+
+---
+Для описания архитектуры системы используется [модель C4](https://c4model.com/).
+Модель C4 была создана для того, чтобы помочь командам разработки программного обеспечения **ясно и наглядно описывать архитектуру системы** — как на этапе проектирования, так и при документировании существующего кода.
+
+<p align="center">
+    </br><b>Level 1.</b> System context diagram</br></br>
+</p>
+
+<p align="center">
+  <img src="images/context.png" />
+</p>
+
+<p align="center">
+    </br><b>Level 2.</b> Posts system container diagram</br></br>
+</p>
+
+<p align="center">
+  <img src="images/posts_container.png" />
+</p>
+
+<p align="center">
+    </br><b>Level 2.</b> Reactions system container diagram</br></br>
+</p>
+
+<p align="center">
+  <img src="images/reactions_container.png" />
+</p>
+
+<p align="center">
+    </br><b>Level 2.</b> Subscriptions system container diagram</br></br>
+</p>
+
+<p align="center">
+  <img src="images/subscriptions_system.png" />
+</p>
+
+<p align="center">
+    </br><b>Level 2.</b> Feed system container diagram</br></br>
+</p>
+
+<p align="center">
+  <img src="images/feed_container.png" />
+</p>
 
 ---
 

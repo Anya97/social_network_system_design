@@ -59,5 +59,3 @@ db.createCollection("posts", {
 });
 
 db.post_likes.createIndex({ user_id: 1 });
-
-+ Redis в качестве кэша для ленты

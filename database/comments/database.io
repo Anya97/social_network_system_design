@@ -32,5 +32,3 @@ db.createCollection("comments", {
 });
 
 db.post_likes.createIndex({ post_id: 1 });
-
-+ Redis в качестве кэша

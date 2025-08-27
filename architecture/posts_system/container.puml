@@ -1,0 +1,31 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!include <cloudinsight/mongodb>
+
+Person(user, "User", "A person using the platform")
+Container(clientApp, "Client Application", "Web/Mobile App", "Interface for interacting with posts")
+Container(loadBalancer, "Load Balancer", "Nginx", "Distributes requests")
+
+System_Boundary(postsSystem, "Posts System") {
+    Container(postsService, "Posts Service", "Go", "Handles creation, deletion, and retrieval of posts", $tags="webApp")
+    ContainerDb(postsDb, "Posts Database", "MongoDB", "Stores posts with text, metadata, and image references", $sprite="mongodb", $tags="db")
+    Container_Ext(s3, "Object Storage", "S3", "Stores uploaded post images")
+}
+
+Container_Ext(cdn, "CDN", "CloudFront", "Delivers post images to users")
+
+' Feed System (represented externally)
+Container_Ext(feedSystem, "Feed System", "Go", "Generates user feeds based on subscriptions and post data")
+
+Rel(user, clientApp, "Uses", "HTTPS")
+Rel(clientApp, loadBalancer, "Sends requests", "HTTPS")
+Rel(loadBalancer, postsService, "Routes post-related requests", "HTTP")
+Rel(postsService, postsDb, "Stores and retrieves post documents")
+Rel(postsService, s3, "Uploads post images")
+
+Rel(clientApp, cdn, "Downloads images", "HTTPS")
+Rel(cdn, s3, "Fetches images on cache miss")
+
+Rel(feedSystem, postsDb, "Reads post data for feed generation")
+
+@enduml

@@ -432,7 +432,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Post'
+                  $ref: '#/components/schemas/FeedPost'
         '400':
           description: Invalid request
         '500':
@@ -447,7 +447,7 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required: [ file, user_id ]
+              required: [file, user_id]
               properties:
                 user_id:
                   type: string
@@ -500,6 +500,16 @@ components:
         created_at:
           type: string
           format: date-time
+
+    FeedPost:
+      allOf:
+        - $ref: '#/components/schemas/Post'
+        - type: object
+          properties:
+            likes_count:
+              type: integer
+              description: Number of likes for this post in the feed
+              example: 123
 
     Comment:
       type: object
